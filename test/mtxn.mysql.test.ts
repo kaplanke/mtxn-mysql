@@ -66,10 +66,10 @@ describe("Multiple transaction manager mysql workflow test...", () => {
 
         // Add last step -> should not execute
         FunctionContext.addTask(txnMngr,
-            (task) => { return new Promise((resolve, reject) => { console.log("All done."); resolve(task); }); },
+            (task) => { return new Promise((resolve, reject) => { console.log("Face the thing that should not be..."); resolve(task); }); },
             null, // optional params
-            (task) => { return new Promise((resolve, reject) => { console.log("Committing..."); resolve(task); }); },
-            (task) => { return new Promise((resolve, reject) => { console.log("Rolling back..."); resolve(task); }); }
+            (task) => Promise.resolve(task),
+            (task) => Promise.resolve(task)
         );
 
 
