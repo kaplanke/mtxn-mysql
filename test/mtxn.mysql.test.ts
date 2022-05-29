@@ -1,6 +1,7 @@
 import log4js from "log4js";
-import mysql from "mysql";
+import mysql from "mysql2";
 import { MultiTxnMngr, FunctionContext, Task } from "multiple-transaction-manager";
+import { describe, test, beforeAll, expect, afterAll } from '@jest/globals';
 import { MysqlDBContext } from "../src/index";
 
 log4js.configure({

@@ -1,6 +1,6 @@
 import { v1 } from "uuid";
 import log4js from "log4js";
-import { Pool, PoolConnection } from "mysql";
+import { Pool, PoolConnection } from "mysql2";
 import { Context, MultiTxnMngr, Task } from "multiple-transaction-manager";
 
 const toUnnamed = require('named-placeholders')();
@@ -63,13 +63,9 @@ class MysqlDBContext implements Context {
             if (!this.isInitialized()) {
                 reject("Cannot rollback. Context not initialised.");
             } else {
-                this.txn?.rollback((err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        this.logger.debug(this.getName() + " is rollbacked.");
-                        resolve(this);
-                    }
+                this.txn?.rollback(() => {
+                    this.logger.debug(this.getName() + " is rollbacked.");
+                    resolve(this);
                     // todo: error handling??
                     this.txn?.release();
                     this.txn = undefined;
