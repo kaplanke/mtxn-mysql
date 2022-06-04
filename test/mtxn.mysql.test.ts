@@ -103,11 +103,11 @@ describe("Multiple transaction manager mysql workflow test...", () => {
             });
 
         // Add control step
-        mysqlContext.addTask(txnMngr, "SELECT * FROM test_table");
+        const controlTask: Task = mysqlContext.addTask(txnMngr, "SELECT * FROM test_table");
 
-        const tasks:Task[] = await txnMngr.exec();
-        
-        expect(tasks[2].getResult().results[0]["name"]).toEqual("Stuart");
+        await txnMngr.exec();
+
+        expect(controlTask.getResult().results[0]["name"]).toEqual("Stuart");
     });
 
 

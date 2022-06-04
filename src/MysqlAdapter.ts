@@ -88,15 +88,17 @@ class MysqlDBContext implements Context {
         return this.txn;
     }
 
-    addTask(txnMngr: MultiTxnMngr, querySql: string, params?: any | undefined) {
+    addTask(txnMngr: MultiTxnMngr, querySql: string, params?: any | undefined): Task {
         const task = new MysqlDBTask(this, querySql, params, undefined);
         txnMngr.addTask(task);
+        return task;
     }
 
     addFunctionTask(txnMngr: MultiTxnMngr,
-        execFunc: ((txn: PoolConnection, task: Task) => Promise<any | undefined>) | undefined) {
+        execFunc: ((txn: PoolConnection, task: Task) => Promise<any | undefined>) | undefined): Task {
         const task = new MysqlDBTask(this, "", undefined, execFunc);
         txnMngr.addTask(task);
+        return task;
     }
 }
 
