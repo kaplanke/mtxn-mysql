@@ -3,6 +3,7 @@ import log4js from "log4js";
 import { Pool, PoolConnection } from "mysql2";
 import { Context, MultiTxnMngr, Task } from "multiple-transaction-manager";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const toUnnamed = require('named-placeholders')();
 
 class MysqlDBContext implements Context {
@@ -88,14 +89,14 @@ class MysqlDBContext implements Context {
         return this.txn;
     }
 
-    addTask(txnMngr: MultiTxnMngr, querySql: string, params?: any | undefined): Task {
+    addTask(txnMngr: MultiTxnMngr, querySql: string, params?: unknown | undefined): Task {
         const task = new MysqlDBTask(this, querySql, params, undefined);
         txnMngr.addTask(task);
         return task;
     }
 
     addFunctionTask(txnMngr: MultiTxnMngr,
-        execFunc: ((txn: PoolConnection, task: Task) => Promise<any | undefined>) | undefined): Task {
+        execFunc: ((txn: PoolConnection, task: Task) => Promise<unknown | undefined>) | undefined): Task {
         const task = new MysqlDBTask(this, "", undefined, execFunc);
         txnMngr.addTask(task);
         return task;
@@ -103,16 +104,16 @@ class MysqlDBContext implements Context {
 }
 
 class MysqlDBTask implements Task {
-    params: any;
+    params: unknown;
     context: MysqlDBContext;
     querySql: string;
-    rs: any | undefined; // {any, FieldInfo[]}
-    execFunc: ((txn: PoolConnection, task: Task) => Promise<any | undefined>) | undefined;
+    rs: unknown | undefined; // {any, FieldInfo[]}
+    execFunc: ((txn: PoolConnection, task: Task) => Promise<unknown | undefined>) | undefined;
 
     constructor(context: MysqlDBContext,
         querySql: string,
-        params: any,
-        execFunc: ((txn: PoolConnection, task: Task) => Promise<any | undefined>) | undefined) {
+        params: unknown,
+        execFunc: ((txn: PoolConnection, task: Task) => Promise<unknown | undefined>) | undefined) {
         this.context = context;
         this.querySql = querySql;
         if (params)
@@ -135,14 +136,14 @@ class MysqlDBTask implements Task {
                     rejectTask(err);
                 });
             } else {
-                let params = [];
+                let params;
                 if (this.params) {
                     if (this.params instanceof Function)
                         params = this.params();
                     else
                         params = this.params;
                 }
-                var q = toUnnamed(this.querySql, params);
+                const q = toUnnamed(this.querySql, params);
                 this.getContext().getTransaction().query(q[0], q[1], (err, results, fields) => {
                     if (err) {
                         rejectTask(err);
@@ -155,11 +156,11 @@ class MysqlDBTask implements Task {
         });
     }
 
-    setParams(params: any) {
+    setParams(params: unknown) {
         this.params = params;
     }
 
-    getResult(): any | undefined {
+    getResult(): unknown | undefined {
         return this.rs;
     }
 
