@@ -8,12 +8,14 @@ const toUnnamed = require('named-placeholders')();
 
 class MysqlDBContext implements Context {
 
+    txnMngr: MultiTxnMngr;
     connPool: Pool;
     txn: PoolConnection | undefined = undefined;
     contextId: string;
     logger = log4js.getLogger("MultiTxnMngr");
 
-    constructor(connPool: Pool) {
+    constructor(txnMngr: MultiTxnMngr, connPool: Pool) {
+        this.txnMngr = txnMngr;
         this.connPool = connPool;
         this.contextId = v1();
     }
@@ -89,16 +91,16 @@ class MysqlDBContext implements Context {
         return this.txn;
     }
 
-    addTask(txnMngr: MultiTxnMngr, querySql: string, params?: unknown | undefined): Task {
+    addTask(querySql: string, params?: unknown | undefined): Task {
         const task = new MysqlDBTask(this, querySql, params, undefined);
-        txnMngr.addTask(task);
+        this.txnMngr.addTask(task);
         return task;
     }
 
-    addFunctionTask(txnMngr: MultiTxnMngr,
+    addFunctionTask(
         execFunc: ((txn: PoolConnection, task: Task) => Promise<unknown | undefined>) | undefined): Task {
         const task = new MysqlDBTask(this, "", undefined, execFunc);
-        txnMngr.addTask(task);
+        this.txnMngr.addTask(task);
         return task;
     }
 }
@@ -160,7 +162,7 @@ class MysqlDBTask implements Task {
         this.params = params;
     }
 
-    getResult(): unknown | undefined {
+    getResult() {
         return this.rs;
     }
 
