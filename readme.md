@@ -59,8 +59,8 @@ https://github.com/kaplanke/mtxn-mysql/blob/master/test/mtxn.mysql.test.ts
     functionContext.addTask(
         (task) => { return new Promise((resolve, _reject) => { console.log("All done."); resolve(task); }); },
         null, // optional params
-        (task) => { return new Promise((resolve, _reject) => { console.log("Committing..."); resolve(task); }); },
-        (task) => { return new Promise((resolve, _reject) => { console.log("Rolling back..."); resolve(task); }); }
+        (task) => { return new Promise((resolve, _reject) => { console.log("On Txn Commit..."); resolve(task); }); },
+        (task) => { return new Promise((resolve, _reject) => { console.log("On Txn Rollback..."); resolve(task); }); }
     );
 
     await expect(txnMngr.exec()).resolves.not.toBeNull();
